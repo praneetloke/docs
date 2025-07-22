@@ -60,6 +60,30 @@ The token can also be stored in your cloud provider's own secret management serv
 or another secret management provider. See the [Managing Secrets](https://buildkite.com/docs/pipelines/security/secrets/managing) guide on Buildkite
 to choose the method that best fits you as a longer-term solution.
 
+As a long-term strategy, you should consider using OIDC with Pulumi, which allows Buildkite
+to exchange an ID token with Pulumi for a short-lived Pulumi Access Token dynamically.
+
+{{% notes type="info" %}}
+Using OIDC auth with Pulumi Cloud is optional but encouraged.
+{{% /notes %}}
+
+Under your Pulumi organization's settings, click on **OIDC issuers** and then register a new issuer with
+the following settings:
+
+* Issuer URL: `https://agent.buildkite.com`
+* Thumbprint: Leave blank. Pulumi will use the thumbprint of the server certificate for `https://agent.buildkite.com/.well-known/openid-configuration`
+* Click **Create issuer**
+
+Once the issuer is created, the policy editor page will open. Update the settings to the following values:
+
+* Decision: Allow
+* Token type: [value is dependent on your Pulumi pricing tier]
+* Rules > `aud` claim: `urn:pulumi:org:{your Pulumi account name}` (Pulumi account name can be your individual account or your Pulumi org name that you see in the URL address bar.)
+* Rules > `sub` claim: See the format of the value used by Buildkite tokens: https://buildkite.com/docs/agent/v3/cli-oidc.
+* Add more claims if you would like Pulumi to validate additional claims in the Buildkite ID token.
+
+See the Pulumi docs for [registering an OIDC issuer](/docs/pulumi-cloud/access-management/oidc-client/) for more information.
+
 ### `.buildkite` Folder
 
 * In your source repository, create the `.buildkite` folder in the root.
@@ -90,12 +114,24 @@ steps:
         # available version.
         #
         # version: 3.183.0
+        #
+        # Optional: Use self-managed backend URL instead of (default) Pulumi Cloud.
+        # backend-url: s3://bucket_name/project_name/stack_name
+        #
+        # Optional: Use OIDC auth with Pulumi Cloud.
+        # use-oidc: true
+        # audience: urn:pulumi:org:{INDIVIDUAL_OR_ORG_LOGIN_NAME}
+        # pulumi-token-type: urn:pulumi:token-type:access_token:personal
+        # pulumi-token-scope: "user:{USER_LOGIN}"
 ```
 
 Use of the `setup-pulumi` [Buildkite plugin for Pulumi](https://github.com/praneetloke/setup-pulumi-buildkite-plugin) is optional.
-You may also consider using one of Pulumi's own [container images](https://github.com/pulumi/pulumi-docker-containers) that is specific to the language
-you're using for your cloud infrastructure app. This version of the `pipeline.yml` file shows how you can use
-one of those images (or even a custom image.)
+However, if you are using OIDC auth with Pulumi, you might consider using the plugin since it handles the OIDC token exchange
+with Pulumi Cloud.
+
+You may also consider using one of Pulumi's own container [images](https://github.com/pulumi/pulumi-docker-containers) for the language
+you're using. Pulumi container images have the Pulumi CLI pre-installed along with the language runtime needed to run your programs.
+The following example shows how you can use one of those images (or even a custom one.)
 
 ```yaml
 env:
@@ -120,8 +156,49 @@ steps:
             - PULUMI_ACCESS_TOKEN
 ```
 
+Create a pull request trigger by editing the [GitHub settings](https://buildkite.com/docs/pipelines/source-control/github#running-builds-on-pull-requests) in the pipeline.
+See Buildkite docs on [source control](https://buildkite.com/docs/pipelines/source-control) for other VCS.
+
+### Push trigger
+
+Similarly, create a pipeline config YAML that runs `pulumi up` when a commit is pushed to your default branch.
+
+```yaml
+env:
+  AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/SOME-ROLE
+  PULUMI_STACK: xxx
+
+steps:
+  - label: ":pulumi: Preview"
+    commands:
+      - npm install
+      - pulumi up -s $PULUMI_STACK
+    plugins:
+      - aws-assume-role-with-web-identity#v1.0.0:
+          role-arn: $AWS_ROLE_ARN
+
+      # Use setup-pulumi plugin or the Docker plugin to ensure Pulumi is installed.
+      ...
+```
+
 ### Quickstart Template
 
 Buildkite has a [CI/CD template](https://buildkite.com/platform/pipelines/templates/iac/pulumi-aws/) for creating AWS infrastructure using Pulumi.
-Although the template assumes no CI triggers are used, it could be a good way to test things out.
 
+{{% notes type="info" %}}
+Although the CI/CD template does not use any CI triggers, it could be another way to quickly test things out.
+{{% /notes %}}
+
+## Next Steps
+
+This guide covered basic steps of running Pulumi in a Buildkite pipeline.
+As your Pulumi project grows and you add more stacks to a project, based on your
+strategy for mapping stacks to branches, especially, if you are using a stack to
+represent a specific environment like test, staging or production.
+You can make the stack name dynamic and run a pipeline for a specific stack
+based on the branch.
+
+And while note strictly necessary, you can also create [dynamic pipelines](https://buildkite.com/docs/pipelines/configure/dynamic-pipelines).
+Similar to Pulumi's concept of using higher-level programming languages for your cloud infrastructure,
+Buildkite, too, allows you to [use a programming language](https://buildkite.com/docs/pipelines/configure/dynamic-pipelines/sdk)
+to generate pipeline configurations dynamically at build time.
