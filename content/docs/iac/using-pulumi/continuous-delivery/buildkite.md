@@ -70,25 +70,25 @@ Using OIDC auth with Pulumi Cloud is optional but encouraged.
 Under your Pulumi organization's settings, click on **OIDC issuers** and then register a new issuer with
 the following settings:
 
-* Issuer URL: `https://agent.buildkite.com`
-* Thumbprint: Leave blank. Pulumi will use the thumbprint of the server certificate for `https://agent.buildkite.com/.well-known/openid-configuration`
-* Click **Create issuer**
+1. Issuer URL: `https://agent.buildkite.com`
+1. Thumbprint: Leave blank. Pulumi will use the thumbprint of the server certificate for `https://agent.buildkite.com/.well-known/openid-configuration`
+1. Click **Create issuer**
 
 Once the issuer is created, the policy editor page will open. Update the settings to the following values:
 
-* Decision: Allow
-* Token type: [value is dependent on your Pulumi pricing tier]
-* Rules > `aud` claim: `urn:pulumi:org:{your Pulumi account name}` (Pulumi account name can be your individual account or your Pulumi org name that you see in the URL address bar.)
-* Rules > `sub` claim: See the format of the value used by Buildkite tokens: https://buildkite.com/docs/agent/v3/cli-oidc.
-* Add more claims if you would like Pulumi to validate additional claims in the Buildkite ID token.
+1. Decision: Allow
+1. Token type: [value is dependent on your Pulumi pricing tier]
+1. Rules > `aud` claim: `urn:pulumi:org:{your Pulumi account name}` (Pulumi account name can be your individual account or your Pulumi org name that you see in the URL address bar.)
+1. Rules > `sub` claim: See the format of the value used by Buildkite tokens: https://buildkite.com/docs/agent/v3/cli-oidc.
+1. Add more claims if you would like Pulumi to validate additional claims in the Buildkite ID token.
 
 See the Pulumi docs for [registering an OIDC issuer](/docs/pulumi-cloud/access-management/oidc-client/) for more information.
 
 ### `.buildkite` Folder
 
-* In your source repository, create the `.buildkite` folder in the root.
+1. In your source repository, create the `.buildkite` folder in the root.
 YAML pipelines must be created in this folder.
-* Create a new file called `pipeline.yml` and paste the following pipeline configuration into the file.
+1. Create a new file called `pipeline.yml` and paste the following pipeline configuration into the file.
 
 **Note**: The pipeline assumes you are using the Node.js Pulumi SDK for your cloud infrastructure
 but you can, of course, use any of the languages supported by Pulumi.
