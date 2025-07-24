@@ -54,7 +54,8 @@ Note the ARN for the AWS IAM role with permission to deploy to your AWS account.
 
 Pulumi CLI requires an access token to be able to store the infrastructure state
 in your Pulumi Cloud account. The access token you created in the prerequisites
-section should be saved as a [pipeline secret](https://buildkite.com/docs/pipelines/security/secrets/buildkite-secrets).
+section should be saved as a [pipeline secret](https://buildkite.com/docs/pipelines/security/secrets/buildkite-secrets)
+named `PULUMI_ACCESS_TOKEN`.
 
 The token can also be stored in your cloud provider's own secret management service
 or another secret management provider. See the [Managing Secrets](https://buildkite.com/docs/pipelines/security/secrets/managing) guide on Buildkite
@@ -105,6 +106,12 @@ steps:
       - pulumi preview -s $PULUMI_STACK | tee preview
       - printf '```\n%b\n```\n' "$(cat preview)" | buildkite-agent annotate --style "info"
     plugins:
+      - secrets:
+        variables:
+          # Map the PULUMI_ACCESS_TOKEN secret to an env var of the same name.
+          # If you are using OIDC, this won't be needed.
+          PULUMI_ACCESS_TOKEN: PULUMI_ACCESS_TOKEN
+
       - aws-assume-role-with-web-identity#v1.0.0:
           role-arn: $AWS_ROLE_ARN
 
@@ -145,6 +152,12 @@ steps:
       - pulumi preview -s $PULUMI_STACK | tee preview
       - printf '```\n%b\n```\n' "$(cat preview)" | buildkite-agent annotate --style "info"
     plugins:
+      - secrets:
+          variables:
+            # Map the PULUMI_ACCESS_TOKEN secret to an env var of the same name.
+            # If you are using OIDC, this won't be needed.
+            PULUMI_ACCESS_TOKEN: PULUMI_ACCESS_TOKEN
+
       - aws-assume-role-with-web-identity#v1.0.0:
           role-arn: $AWS_ROLE_ARN
 
