@@ -79,7 +79,7 @@ Once the issuer is created, the policy editor page will open. Update the setting
 1. Decision: Allow
 1. Token type: [value is dependent on your Pulumi pricing tier]
 1. Rules > `aud` claim: `urn:pulumi:org:{your Pulumi account name}` (Pulumi account name can be your individual account or your Pulumi org name that you see in the URL address bar.)
-1. Rules > `sub` claim: See the format of the value used by Buildkite tokens: https://buildkite.com/docs/agent/v3/cli-oidc.
+1. Rules > `sub` claim: See the format of the value used by Buildkite tokens: https://buildkite.com/docs/agent/v3/cli-oidc#claims.
 1. Add more claims if you would like Pulumi to validate additional claims in the Buildkite ID token.
 
 See the Pulumi docs for [registering an OIDC issuer](/docs/pulumi-cloud/access-management/oidc-client/) for more information.
