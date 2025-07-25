@@ -205,23 +205,21 @@ Although the CI/CD template does not use any CI triggers, it could be another wa
 
 ## Next Steps
 
-This guide covered basic steps of running Pulumi in a Buildkite pipeline.
-As your Pulumi project grows and you add more stacks to a project, based on your
-strategy for mapping stacks to branches, especially, if you are using a stack to
-represent a specific environment like test, staging or production.
-You can make the stack name dynamic and run a pipeline for a specific stack
-based on the branch.
+This guide covered a simple way of running Pulumi in a Buildkite pipeline.
+As your Pulumi project grows and you add more stacks to a project, you
+can make the stack name dynamic (the `PULUMI_STACK` env var in the examples
+above) and run a pipeline for a specific stack based on a branch.
 
 ### Dynamic Pipelines
 
-While note strictly necessary, you can also create [dynamic pipelines](https://buildkite.com/docs/pipelines/configure/dynamic-pipelines).
-Similar to Pulumi's concept of using higher-level programming languages for your cloud infrastructure,
-Buildkite, too, allows you to [use a programming language](https://buildkite.com/docs/pipelines/configure/dynamic-pipelines/sdk)
+Buildkite allows you to create [dynamic pipelines](https://buildkite.com/docs/pipelines/configure/dynamic-pipelines).
+Similar to Pulumi, Buildkite, too, allows you to use a [programming language](https://buildkite.com/docs/pipelines/configure/dynamic-pipelines/sdk)
 to generate pipeline configurations dynamically at build time.
 
 ### Cache Volumes
 
-[Cache volumes](https://buildkite.com/docs/pipelines/hosted-agents/cache-volumes) are external volumes attached to hosted agent instances.
-They can be used to cache Pulumi plugins that get installed in `$HOME/.pulumi/plugins`, as well as any
-language-specific packages, i.e. `node_modules` etc. Pulumi plugin binary versions are 1:1 with the
+[Cache volumes](https://buildkite.com/docs/pipelines/hosted-agents/cache-volumes) are
+external volumes attached to hosted agent instances. They can be used to cache Pulumi
+plugins that get installed in `$HOME/.pulumi/plugins`, as well as any language-specific
+packages, i.e. `node_modules` etc. Pulumi plugin binary versions are 1:1 with the
 versions of the Pulumi packages that use them.
