@@ -86,10 +86,19 @@ Once the issuer is created, the policy editor page will open. Update the setting
 
 See the Pulumi docs for [registering an OIDC issuer](/docs/pulumi-cloud/access-management/oidc-client/) for more information.
 
-### `.buildkite` Folder
+### Defining Pipeline Steps
 
-1. In your source repository, create the `.buildkite` folder in the root.
-YAML pipelines must be created in this folder.
+Pipeline steps can be defined in Buildkite directly or stored in a YAML file in your
+source repo. Defining steps in a YAML file will give you access to more configuration
+options than the web interface.
+
+{{% notes type="info" %}}
+If you are modifying an existing pipeline and have not yet migrated to YAML steps, you can do so on your pipeline's settings page.
+See the [Migrating to YAML steps guide](https://buildkite.com/docs/pipelines/tutorials/pipeline-upgrade) for more information about the changes and the migration process.
+{{% /notes %}}
+
+1. In your source repository, create the `.buildkite` folder in the root. A Buildkite agent will look for a pipeline
+configuration file [in a few places](https://buildkite.com/docs/agent/v3/cli-pipeline#uploading-pipelines-description). You may also choose one of the other locations to store your config.
 1. Create a new file called `pipeline.yml` and paste the following pipeline configuration into the file.
 
 **Note**: The pipeline assumes you are using the Node.js Pulumi SDK for your cloud infrastructure
