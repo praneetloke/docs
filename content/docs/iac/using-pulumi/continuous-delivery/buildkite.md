@@ -183,7 +183,7 @@ env:
   PULUMI_STACK: xxx
 
 steps:
-  - label: ":pulumi: Preview"
+  - label: ":pulumi: Up"
     commands:
       - npm install
       - pulumi up -s $PULUMI_STACK
