@@ -52,7 +52,7 @@ but you can, of course, use any of the languages supported by Pulumi.
 
 ```yaml
 env:
-  PULUMI_STACK: xxx
+  PULUMI_STACK: dev
 
 steps:
   - label: ":pulumi: Preview"
