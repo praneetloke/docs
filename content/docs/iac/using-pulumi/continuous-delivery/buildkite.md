@@ -28,9 +28,6 @@ named `PULUMI_ACCESS_TOKEN`.
 
 ## Pipelines
 
-With your Buildkite account and agent setup, you can configure pipelines using YAML.
-You may use Buildkite's UI to create a pipeline quickly for a test too, but note that
-YAML pipelines will soon replace the UI method of creating pipelines.
 
 ## Install and Configure Pulumi
 
