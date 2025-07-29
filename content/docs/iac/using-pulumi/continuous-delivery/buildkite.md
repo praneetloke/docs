@@ -26,9 +26,6 @@ named `PULUMI_ACCESS_TOKEN`.
   - Some cloud providers support OIDC token exchange. See [OIDC in Buildkite Pipelines](https://buildkite.com/docs/pipelines/security/oidc).
 - A Buildkite cluster and agent. Follow the [Getting Started](https://buildkite.com/docs/pipelines/getting-started) guide to complete setup.
 
-## Pipelines
-
-
 ## Install and Configure Pulumi
 
 Pipeline steps can be defined in Buildkite directly or stored in a YAML file in your
