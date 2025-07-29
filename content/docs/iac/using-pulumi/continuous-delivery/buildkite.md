@@ -123,8 +123,6 @@ steps:
 Create a pull request trigger by editing the [GitHub settings](https://buildkite.com/docs/pipelines/source-control/github#running-builds-on-pull-requests) in the pipeline.
 See Buildkite docs on [source control](https://buildkite.com/docs/pipelines/source-control) for other VCS.
 
-### Push trigger
-
 Similarly, create a pipeline config YAML that runs `pulumi up` when a commit is pushed to your default branch.
 
 ```yaml
