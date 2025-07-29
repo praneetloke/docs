@@ -35,10 +35,6 @@ Pipeline steps can be defined in Buildkite directly or stored in a YAML file in 
 source repo. Defining steps in a YAML file will give you access to more configuration
 options than the web interface.
 
-{{% notes type="info" %}}
-If you are modifying an existing pipeline and have not yet migrated to YAML steps, you can do so on your pipeline's settings page.
-See the [Migrating to YAML steps guide](https://buildkite.com/docs/pipelines/tutorials/pipeline-upgrade) for more information about the changes and the migration process.
-{{% /notes %}}
 
 1. In your source repository, create the `.buildkite` folder in the root. The Buildkite agent will look for a pipeline
 configuration file [in a few places](https://buildkite.com/docs/agent/v3/cli-pipeline#uploading-pipelines-description). You may also choose one of the other locations to store your config.
