@@ -32,7 +32,7 @@ With your Buildkite account and agent setup, you can configure pipelines using Y
 You may use Buildkite's UI to create a pipeline quickly for a test too, but note that
 YAML pipelines will soon replace the UI method of creating pipelines.
 
-### Defining Pipeline Steps
+## Install and Configure Pulumi
 
 Pipeline steps can be defined in Buildkite directly or stored in a YAML file in your
 source repo. Defining steps in a YAML file will give you access to more configuration
