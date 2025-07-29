@@ -11,11 +11,7 @@ menu:
         weight: 2
 ---
 
-[Buildkite](https://buildkite.com/) is a continuous delivery platform designed to scale with your projects.
-Buildkite [powers](https://buildkite.com/platform/) the most demanding and sophisticated software companies in the world.
-
-This guide shows you how you can run Pulumi in Buildkite, so you can go from deploying your cloud infrastructure to deploying
-applications that run on that cloud infrastructure all in the same CI/CD service.
+[Buildkite](https://buildkite.com/) is a continuous intergration and delivery platform designed to scale with your projects. This guide shows you how to install, configure, and run Pulumi in a Buildkite pipeline.
 
 ## Prerequisites
 
