@@ -21,70 +21,20 @@ applications that run on that cloud infrastructure all in the same CI/CD service
 
 - Sign up for a [Pulumi account](https://app.pulumi.com)
 - Create a [Pulumi Access Token](https://app.pulumi.com/account/tokens)
-  - Keep this token somewhere safe. You'll need this later.
+  - Save this token as a [pipeline secret](https://buildkite.com/docs/pipelines/security/secrets/buildkite-secrets)
+named `PULUMI_ACCESS_TOKEN`.
 - Install the [latest Pulumi CLI](/docs/install/), so you can run the project locally as a test
 - Create a new GitHub [repository](https://support.atlassian.com/bitbucket-cloud/docs/create-a-git-repository/)
-
 - Create a [new Pulumi project](/tutorials/pulumi-fundamentals/create-a-pulumi-project/) and [initialize it as a git repository](https://git-scm.com/docs/git-init)
-
-### Buildkite Agent
-
-Buildkite offers two ways to run an agent. An agent is required to run your pipelines.
-Agents can either be [managed](https://buildkite.com/docs/pipelines/getting-started#set-up-an-agent-create-a-buildkite-hosted-agent) (Buildkite hosted) or [self-hosted](https://buildkite.com/docs/pipelines/getting-started#set-up-an-agent-install-and-run-a-self-hosted-agent).
-The [Pipelines architecture](https://buildkite.com/docs/pipelines/architecture) page has more information you might find helpful.
-
-If you are kicking tires and want to get started quickly to explore all the features Buildkite has to offer,
-we recommend that you [signup](https://buildkite.com/signup) for a hosted agent.
+- Obtain credentials for the cloud provider your Pulumi project will use and store them as pipeline secrets similar to the Pulumi access token from the previous step.
+  - Some cloud providers support OIDC token exchange. See [OIDC in Buildkite Pipelines](https://buildkite.com/docs/pipelines/security/oidc).
+- A Buildkite cluster and agent. Follow the [Getting Started](https://buildkite.com/docs/pipelines/getting-started) guide to complete setup.
 
 ## Pipelines
 
 With your Buildkite account and agent setup, you can configure pipelines using YAML.
 You may use Buildkite's UI to create a pipeline quickly for a test too, but note that
 YAML pipelines will soon replace the UI method of creating pipelines.
-
-### Cloud Provider Setup
-
-In this guide, we'll use AWS as the target cloud provider but the steps
-are easily transferrable to other cloud providers.
-Buildkite supports [OIDC auth with AWS](https://buildkite.com/docs/pipelines/security/oidc/aws).
-
-Note the ARN for the AWS IAM role with permission to deploy to your AWS account.
-
-### Pulumi Account Authentication
-
-Pulumi CLI requires an access token to be able to store the infrastructure state
-in your Pulumi Cloud account. The access token you created in the prerequisites
-section should be saved as a [pipeline secret](https://buildkite.com/docs/pipelines/security/secrets/buildkite-secrets)
-named `PULUMI_ACCESS_TOKEN`.
-
-The token can also be stored in your cloud provider's own secret management service
-or another secret management provider. See the [Managing Secrets](https://buildkite.com/docs/pipelines/security/secrets/managing) guide on Buildkite
-to choose the method that best fits you as a longer-term solution.
-
-As a long-term strategy, you should consider using OIDC with Pulumi, which allows Buildkite
-to exchange an ID token with Pulumi for a short-lived Pulumi Access Token dynamically.
-
-{{% notes type="info" %}}
-Using OIDC auth with Pulumi Cloud is optional but encouraged.
-{{% /notes %}}
-
-Under your Pulumi organization's settings, click on **OIDC issuers** and then register a new issuer with
-the following settings:
-
-1. Issuer URL: `https://agent.buildkite.com`
-1. Thumbprint: Leave blank. Pulumi will use the thumbprint of the server certificate for `https://agent.buildkite.com/.well-known/openid-configuration`
-1. Click **Create issuer**
-
-Once the issuer is created, the policy editor page will open. Update the settings to the following values:
-
-1. Decision: Allow
-1. Token type: [value is dependent on your Pulumi pricing tier]
-1. Rules > `aud` claim: `urn:pulumi:org:{your Pulumi account name}` (Pulumi account name can be your individual account or your Pulumi org name that you see in the URL address bar.)
-1. Rules > `sub` claim: See the format of the value used by Buildkite tokens: https://buildkite.com/docs/agent/v3/cli-oidc#claims.
-    - If there are parts of `sub` string that you don't want to specify a value for, you must use a wildcard char `*` in its place. For example, if the organization name is `myorg` and the pipeline name is `mypipeline`, a `sub` claim value of `organization:myorg:pipeline:mypipeline:ref:*:commit:*:step:*` would mean that Pulumi would ignore the value of `ref`, `commit` and `step` tokens.
-1. Add more claims if you would like Pulumi to validate additional claims in the Buildkite ID token.
-
-See the Pulumi docs for [registering an OIDC issuer](/docs/pulumi-cloud/access-management/oidc-client/) for more information.
 
 ### Defining Pipeline Steps
 
@@ -106,7 +56,6 @@ but you can, of course, use any of the languages supported by Pulumi.
 
 ```yaml
 env:
-  AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/SOME-ROLE
   PULUMI_STACK: xxx
 
 steps:
@@ -121,9 +70,11 @@ steps:
           # Map the PULUMI_ACCESS_TOKEN secret to an env var of the same name.
           # If you are using OIDC, this won't be needed.
           PULUMI_ACCESS_TOKEN: PULUMI_ACCESS_TOKEN
-
-      - aws-assume-role-with-web-identity#v1.0.0:
-          role-arn: $AWS_ROLE_ARN
+          #
+          # NOTE: Don't forget to map cloud provider credentials as env vars
+          # also unless you are using OIDC with the cloud provider too.
+          # AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+          # AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
 
       - pulumi#v1.0.0:
         # Optional: The specific version to install
@@ -152,7 +103,6 @@ The following example shows how you can use one of those images (or even a custo
 
 ```yaml
 env:
-  AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/SOME-ROLE
   PULUMI_STACK: xxx
 
 steps:
@@ -167,16 +117,22 @@ steps:
             # Map the PULUMI_ACCESS_TOKEN secret to an env var of the same name.
             # If you are using OIDC, this won't be needed.
             PULUMI_ACCESS_TOKEN: PULUMI_ACCESS_TOKEN
-
-      - aws-assume-role-with-web-identity#v1.0.0:
-          role-arn: $AWS_ROLE_ARN
+            #
+            # NOTE: Don't forget to map cloud provider credentials as env vars
+            # also unless you are using OIDC with the cloud provider too.
+            # AWS_ACCESS_KEY_ID: AWS_ACCESS_KEY_ID
+            # AWS_SECRET_ACCESS_KEY: AWS_SECRET_ACCESS_KEY
 
       - docker#v5.9.0:
           image: "pulumi/pulumi-nodejs"
-          propagate-aws-auth-tokens: true
           mount-buildkite-agent: true
           environment:
             - PULUMI_ACCESS_TOKEN
+            #
+            # NOTE: Don't forget to map cloud provider credentials as env vars
+            # also unless you are using OIDC with the cloud provider too.
+            # - AWS_ACCESS_KEY_ID
+            # - AWS_SECRET_ACCESS_KEY
 ```
 
 Create a pull request trigger by editing the [GitHub settings](https://buildkite.com/docs/pipelines/source-control/github#running-builds-on-pull-requests) in the pipeline.
@@ -188,7 +144,6 @@ Similarly, create a pipeline config YAML that runs `pulumi up` when a commit is 
 
 ```yaml
 env:
-  AWS_ROLE_ARN: arn:aws:iam::AWS-ACCOUNT-ID:role/SOME-ROLE
   PULUMI_STACK: xxx
 
 steps:
@@ -197,20 +152,9 @@ steps:
       - npm install
       - pulumi up -s $PULUMI_STACK
     plugins:
-      - aws-assume-role-with-web-identity#v1.0.0:
-          role-arn: $AWS_ROLE_ARN
-
-      # Use setup-pulumi plugin or the Docker plugin to ensure Pulumi is installed.
+      # Use pulumi plugin or the Docker plugin to ensure Pulumi is installed.
       ...
 ```
-
-### Quickstart Template
-
-Buildkite has a [CI/CD template](https://buildkite.com/platform/pipelines/templates/iac/pulumi-aws/) for creating AWS infrastructure using Pulumi.
-
-{{% notes type="info" %}}
-Although the CI/CD template does not use any CI triggers, it could be another way to quickly test things out.
-{{% /notes %}}
 
 ## Next Steps
 
