@@ -99,7 +99,7 @@ The following example shows how you can use one of those images (or even a custo
 
 ```yaml
 env:
-  PULUMI_STACK: xxx
+  PULUMI_STACK: dev
 
 steps:
   - label: ":pulumi: Preview"
