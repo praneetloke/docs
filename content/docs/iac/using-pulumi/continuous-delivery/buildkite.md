@@ -20,7 +20,7 @@ menu:
   - Save this token as a [pipeline secret](https://buildkite.com/docs/pipelines/security/secrets/buildkite-secrets)
 named `PULUMI_ACCESS_TOKEN`.
 - Install the [latest Pulumi CLI](/docs/install/), so you can run the project locally as a test
-- Create a new GitHub [repository](https://support.atlassian.com/bitbucket-cloud/docs/create-a-git-repository/)
+- Create a new GitHub [repository](https://github.com/new)
 - Create a [new Pulumi project](/tutorials/pulumi-fundamentals/create-a-pulumi-project/) and [initialize it as a git repository](https://git-scm.com/docs/git-init)
 - Obtain credentials for the cloud provider your Pulumi project will use and store them as pipeline secrets similar to the Pulumi access token from the previous step.
   - Some cloud providers support OIDC token exchange. See [OIDC in Buildkite Pipelines](https://buildkite.com/docs/pipelines/security/oidc).
