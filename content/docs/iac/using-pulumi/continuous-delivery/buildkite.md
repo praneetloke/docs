@@ -125,7 +125,7 @@ steps:
       - aws-assume-role-with-web-identity#v1.0.0:
           role-arn: $AWS_ROLE_ARN
 
-      - setup-pulumi:
+      - pulumi#v1.0.0:
         # Optional: The specific version to install
         # if you don't want to use the latest
         # available version.
@@ -142,11 +142,11 @@ steps:
         # pulumi-token-scope: "user:{USER_LOGIN}"
 ```
 
-Use of the `setup-pulumi` [Buildkite plugin for Pulumi](https://github.com/praneetloke/setup-pulumi-buildkite-plugin) is optional.
+Use of the `pulumi` [plugin](https://buildkite.com/resources/plugins/buildkite-plugins/pulumi-buildkite-plugin/) is optional.
 However, if you are using OIDC auth with Pulumi, you might consider using the plugin since it handles the OIDC token exchange
 with Pulumi Cloud.
 
-You may also consider using one of Pulumi's own container [images](https://github.com/pulumi/pulumi-docker-containers) for the language
+Another option to consider is to use one of Pulumi's official container [images](https://github.com/pulumi/pulumi-docker-containers) for the language
 you're using. Pulumi container images have the Pulumi CLI pre-installed along with the language runtime needed to run your programs.
 The following example shows how you can use one of those images (or even a custom one.)
 
